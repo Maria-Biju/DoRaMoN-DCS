@@ -53,6 +53,15 @@ GitHub Copilot suggestion
 
 
 ->prompts
-1)I am building a generic Decision Companion System as a FastAPI web app. 
+1)"I am building a generic Decision Companion System as a FastAPI web app. 
 Help me divide the entire project into clear development parts based on system architecture 
-(schemas, decision engine, API, UI, and documentation), so that I can implement and commit each stage incrementally.
+(schemas, decision engine, API, UI, and documentation), so that I can implement and commit each stage incrementally."
+
+2)"**role**you are a senior software engineer 
+**task**you are assigned to built a decision companion system which help users make better real world decisions 
+**instructions**the system should should assist a user in evaluating options for a real world decision of their choice.The system should work without relying completely on ai, the system must accept multiple options, accept criteria which may have different weights, provide a ranked recommendation, process and evaluate options against criteria, explain why a particulat recommendation was made, make it a web app use python as the leadind language
+**data**example cases are choosing a laptop under budget,selecting a best candidate for a job role, deciding where to travel within constrains, picking an investment plan, choosing a tech stack for a startup"
+
+3)"explain the different algorithms  like MCDA for decision making based on criteria and weights and explain why MCDA is better"
+
+4)"explain how normalization actually works and why cost vs benefit criteria need inversion and implement MCDA-WSM algorithm "

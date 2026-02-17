@@ -50,3 +50,9 @@ GitHub Copilot suggestion
 - External API data fetching: increases scope and reduces reliability; not required by assignment
 - Database + auth: not required for MVP; adds time with little evaluation benefit
 - Heavy AI summarization: can reduce explainability and needs citation/provenance
+
+
+->prompts
+1)I am building a generic Decision Companion System as a FastAPI web app. 
+Help me divide the entire project into clear development parts based on system architecture 
+(schemas, decision engine, API, UI, and documentation), so that I can implement and commit each stage incrementally.

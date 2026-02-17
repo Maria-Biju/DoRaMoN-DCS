@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from app.api.schemas import Scenario, EvaluationResult
+
 
 router = APIRouter()
 

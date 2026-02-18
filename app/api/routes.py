@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from app.api.schemas import Scenario, EvaluationResult
 
+from app.api.schemas import Scenario, EvaluationResult
+from app.engine.evaluate import evaluate_wsm
 
 router = APIRouter()
 
@@ -8,5 +9,13 @@ router = APIRouter()
 def home():
     return {
         "message": "Decision Companion System is running",
-        "next": "POST /api/evaluate (coming soon)"
+        "next": "POST /api/evaluate"
     }
+
+@router.post("/api/evaluate", response_model=EvaluationResult)
+def evaluate(scenario: Scenario) -> EvaluationResult:
+    ranked = evaluate_wsm(scenario)
+    return EvaluationResult(
+        title=scenario.title,
+        ranked_option_names=ranked
+    )

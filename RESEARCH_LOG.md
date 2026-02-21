@@ -52,7 +52,25 @@ GitHub Copilot suggestion
 - Heavy AI summarization: can reduce explainability and needs citation/provenance
 
 
-->prompts
+-->old prompts used in the initial stage  which not included at first
+
+
+-> did they mean a decision making companion which can be used evrywhere not just one scenario
+
+-> so does it mean to be a decision making companion the user will provide their options and weights and systen need to find which one is better rather than finding even better choices or gather more information from that
+
+-> dynamic criteria
+
+-> but choosing a tech stack for a startup and picking an investment strategy needs real world data also to make it more efficient 
+
+->can we do it as parts so that i cam commit with meaningfull messages can we complte this in 10 parts or more
+
+->explain part1 in detail
+->explain the problem and the decision companion system and explain the parts we did till part 2 and explain the remaining works
+
+
+->            prompts uptodate
+
 1)"I am building a generic Decision Companion System as a FastAPI web app. 
 Help me divide the entire project into clear development parts based on system architecture 
 (schemas, decision engine, API, UI, and documentation), so that I can implement and commit each stage incrementally."
@@ -65,3 +83,4 @@ Help me divide the entire project into clear development parts based on system a
 3)"explain the different algorithms  like MCDA for decision making based on criteria and weights and explain why MCDA is better"
 
 4)"explain how normalization actually works and why cost vs benefit criteria need inversion and implement MCDA-WSM algorithm "
+       

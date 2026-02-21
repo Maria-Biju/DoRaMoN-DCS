@@ -48,6 +48,13 @@ class Scenario(BaseModel):
 
 
 # ---- Placeholder response model for the next parts ----
+class OptionExplanation(BaseModel):
+    name: str
+    score: float
+    contributions: Dict[str, float]
+
+
 class EvaluationResult(BaseModel):
     title: str
     ranked_option_names: List[str]
+    details: List[OptionExplanation]

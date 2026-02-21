@@ -14,8 +14,12 @@ def home():
 
 @router.post("/api/evaluate", response_model=EvaluationResult)
 def evaluate(scenario: Scenario) -> EvaluationResult:
-    ranked = evaluate_wsm(scenario)
+    details = evaluate_wsm(scenario)
+
+    ranked_names = [d.name for d in details]
+
     return EvaluationResult(
         title=scenario.title,
-        ranked_option_names=ranked
+        ranked_option_names=ranked_names,
+        details=details
     )

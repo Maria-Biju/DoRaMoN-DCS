@@ -52,6 +52,9 @@ class OptionExplanation(BaseModel):
     name: str
     score: float
     contributions: Dict[str, float]
+    strengths: List[str]=[]
+    weaknesses: List[str]=[]
+    why: str =""
 
 
 class EvaluationResult(BaseModel):

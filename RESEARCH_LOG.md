@@ -83,4 +83,7 @@ Help me divide the entire project into clear development parts based on system a
 3)"explain the different algorithms  like MCDA for decision making based on criteria and weights and explain why MCDA is better"
 
 4)"explain how normalization actually works and why cost vs benefit criteria need inversion and implement MCDA-WSM algorithm "
-       
+
+->give the test cases to check to evaluate inside swagger    
+
+->

@@ -1,6 +1,8 @@
 '''Explain:
 
 How you started
+ started by collecting details from stack overflow,copilet,chatgpt etc about what are the features of a decision making companion system and what are the algorithms that can be  used ,firstly thought of using an ai agent or using webscrapping to collecte all the related relevant informations that can help client to take decisions then dropped that since ai usage is not much entertained  and finaly came to using algorithms and make it simple and explainable  and can be scaled later.
+    After that researched about the algorithms and steps involved which includes normalization,flip normalization and weighted sum scoring, for algorithms algorithms considered are AHP,TOPSIS,MCDA etc which are the best once, among these MCDA has been choosen because other have greater complexity and reduced explainability  and thought can be changed if MCDA doesnt worked as expected.
 
 How your thinking evolved:
 
@@ -11,6 +13,7 @@ Alternative algorithms such as AHP and TOPSIS were considered but were not chose
 
 
 Alternative approaches considered:
+
 ->“The system is designed to optionally integrate external data sources in the future. However, for transparency and explainability, this implementation relies on user-provided structured inputs.”
 - AHP: rejected for MVP due to complexity and UI burden (pairwise comparisons)
 - TOPSIS: considered, but deferred due to explanation complexity for end users

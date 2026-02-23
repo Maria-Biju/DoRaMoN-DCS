@@ -86,4 +86,5 @@ Help me divide the entire project into clear development parts based on system a
 
 ->give the test cases to check to evaluate inside swagger    
 
-->
+->give part 7 where the errors are handled properly and also checks duplicate criterion errors ,nr=egatice weights or missing fields values are given by user and also the test cases to check in swagger
+

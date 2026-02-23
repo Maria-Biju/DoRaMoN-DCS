@@ -37,7 +37,10 @@ class Option(BaseModel):
         description="Keyed by criterion id; value can be number/bool/category label"
     )
 
-
+class Constraint(BaseModel):
+    criterion_id: str
+    op: Literal["<=", "<", ">=", ">", "=="]
+    value: float
 class Scenario(BaseModel):
     """
     A Scenario bundles criteria + options for a decision.
@@ -45,7 +48,7 @@ class Scenario(BaseModel):
     title: str = Field(default="Untitled Decision")
     criteria: List[Criterion] = Field(default_factory=list)
     options: List[Option] = Field(default_factory=list)
-
+    constraints: List[Constraint] = []
 
 # ---- Placeholder response model for the next parts ----
 class OptionExplanation(BaseModel):
@@ -55,9 +58,12 @@ class OptionExplanation(BaseModel):
     strengths: List[str]=[]
     weaknesses: List[str]=[]
     why: str =""
-
-
+class FilteredOutOption(BaseModel):
+    name: str
+    reasons: List[str]
+    
 class EvaluationResult(BaseModel):
     title: str
     ranked_option_names: List[str]
     details: List[OptionExplanation]
+    filtered_out: List[FilteredOutOption] = []

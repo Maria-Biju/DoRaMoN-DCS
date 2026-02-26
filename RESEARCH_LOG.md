@@ -84,8 +84,11 @@ Help me divide the entire project into clear development parts based on system a
 
 4)"explain how normalization actually works and why cost vs benefit criteria need inversion and implement MCDA-WSM algorithm "
 
+->but i think combining AHP and TOPSIS will give better accuracy than this
+
 ->give the test cases to check to evaluate inside swagger    
 
 ->give part 7 where the errors are handled properly and also checks duplicate criterion errors ,nr=egatice weights or missing fields values are given by user and also the test cases to check in swagger
  ->before moving to next session explain the code in deatil
+ 
  

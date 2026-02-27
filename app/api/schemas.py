@@ -7,6 +7,9 @@ CriterionType = Literal["number", "boolean", "category"]
 # Whether higher values are better or worse
 GoalType = Literal["benefit", "cost"]
 
+# Part 13: insight toggle
+InsightMode = Literal["none", "competitor", "sensitivity", "both"]
+
 
 class Criterion(BaseModel):
     """
@@ -37,10 +40,13 @@ class Option(BaseModel):
         description="Keyed by criterion id; value can be number/bool/category label"
     )
 
+
 class Constraint(BaseModel):
     criterion_id: str
     op: Literal["<=", "<", ">=", ">", "=="]
     value: float
+
+
 class Scenario(BaseModel):
     """
     A Scenario bundles criteria + options for a decision.
@@ -48,19 +54,18 @@ class Scenario(BaseModel):
     title: str = Field(default="Untitled Decision")
     criteria: List[Criterion] = Field(default_factory=list)
     options: List[Option] = Field(default_factory=list)
-    constraints: List[Constraint] = []
+    constraints: List[Constraint] = Field(default_factory=list)
 
-# ---- Placeholder response model for the next parts ----
-from typing import Dict, List, Optional
-from pydantic import BaseModel
+    # Part 13: optional insights
+    insight_mode: InsightMode = "none"
 
 
 class OptionExplanation(BaseModel):
     name: str
     score: float
     contributions: Dict[str, float]
-    strengths: List[str] = []
-    weaknesses: List[str] = []
+    strengths: List[str] = Field(default_factory=list)
+    weaknesses: List[str] = Field(default_factory=list)
     why: str = ""
 
 
@@ -95,6 +100,6 @@ class EvaluationResult(BaseModel):
     title: str
     ranked_option_names: List[str]
     details: List[OptionExplanation]
-    filtered_out: List[FilteredOutOption] = []
+    filtered_out: List[FilteredOutOption] = Field(default_factory=list)
     companion_insight: Optional[CompanionInsight] = None
     sensitivity: Optional[SensitivityResult] = None

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Dict, List, Tuple, Optional
-from app.api.schemas import CompanionInsight
+
 from app.api.schemas import (
     Scenario,
     OptionExplanation,
@@ -43,7 +43,7 @@ def _build_why(strengths: List[str], weaknesses: List[str], score: float) -> str
         weakness_text = f"{weaknesses[0]} and {weaknesses[1]}"
 
     return (
-        f"Scored {round(score,4)} mainly due to strong performance on {strength_text}. "
+        f"Scored {round(score, 4)} mainly due to strong performance on {strength_text}. "
         f"Lower contribution came from {weakness_text}."
     )
 
@@ -73,36 +73,43 @@ def _build_companion_insight(
 ) -> Optional[CompanionInsight]:
     """
     Part 13 (Companion Insight):
-    - closest competitor = runner-up
-    - why competitor lost = criteria where runner-up contributed less than winner (top 2)
+    - closest competitor = option with the smallest score gap from the winner
+    - why competitor lost = criteria where winner had the biggest advantage (top 2),
+      based on contribution deltas.
     """
     if len(ranked) < 2:
         return None
 
     winner = ranked[0]
-    runner = ranked[1]
 
-    # delta = runner - winner; negative means runner underperformed
-    deltas: List[Tuple[str, float]] = []
+    # Closest competitor by score difference (usually rank #2, but handles ties/edge cases)
+    runner = min(
+        ranked[1:],
+        key=lambda r: abs(float(winner.score) - float(r.score)),
+    )
+
+    # Winner advantage per criterion (positive values only)
+    advantages: List[Tuple[str, float]] = []
     for c in scenario.criteria:
         w_contrib = float(winner.contributions.get(c.id, 0.0))
         r_contrib = float(runner.contributions.get(c.id, 0.0))
-        deltas.append((c.name, r_contrib - w_contrib))
+        diff = w_contrib - r_contrib  # positive => winner benefited more
+        if diff > 0:
+            advantages.append((c.name, diff))
 
-    negatives = [(name, d) for (name, d) in deltas if d < 0]
-    negatives.sort(key=lambda x: x[1])  # most negative first
+    advantages.sort(key=lambda x: x[1], reverse=True)
 
     reasons: List[str] = []
-    for name, d in negatives[:2]:
-        reasons.append(f"Lower contribution on {name} ({round(d,4)}) compared to {winner.name}")
+    for name, d in advantages[:2]:
+        reasons.append(f"{winner.name} gained more from {name} (+{round(d, 4)})")
 
     if not reasons:
-        reasons.append("Scores are very close; small preference changes may flip the ranking.")
+        reasons.append("Scores are extremely close; small preference changes may flip the ranking.")
 
     gap = round(float(winner.score) - float(runner.score), 4)
     summary = (
         f"{winner.name} ranked #1. Closest competitor is {runner.name}. "
-        f"{runner.name} lost mainly because: " + "; ".join(reasons)
+        f"Main reasons: " + "; ".join(reasons)
     )
 
     return CompanionInsight(
@@ -153,9 +160,9 @@ def _build_sensitivity(
             most_sensitive = cid
 
     summary = (
-        f"Winner stays the same for all +{int(delta*100)}% single-criterion weight changes."
+        f"Winner stays the same for all +{int(delta * 100)}% single-criterion weight changes."
         if most_sensitive is None
-        else f"Winner changes when '{most_sensitive}' weight is increased by +{int(delta*100)}% (then renormalized)."
+        else f"Winner changes when '{most_sensitive}' weight is increased by +{int(delta * 100)}% (then renormalized)."
     )
 
     return SensitivityResult(
@@ -181,7 +188,7 @@ def evaluate_wsm(
     Includes:
     - Part 8: apply constraints before scoring
     - Part 6: strengths/weaknesses/why (template explanations)
-    - Part 13: companion insight + sensitivity analysis
+    - Part 13: optional companion insight + optional sensitivity analysis
 
     Returns:
       (ranked_explanations, filtered_out, companion_insight, sensitivity)
@@ -260,9 +267,17 @@ def evaluate_wsm(
     # Rank by score descending
     results.sort(key=lambda r: float(r.score), reverse=True)
 
-    # Part 13: companion insight + sensitivity
-    companion = _build_companion_insight(results, scenario)
-    option_names = [o.name for o in kept_options]
-    sensitivity = _build_sensitivity(scenario, option_names, norm_by_criterion, w_norm, delta=0.10)
+    # Part 13: compute insights only when requested
+    mode = getattr(scenario, "insight_mode", "none") or "none"
+
+    companion: Optional[CompanionInsight] = None
+    sensitivity: Optional[SensitivityResult] = None
+
+    if mode in ("competitor", "both"):
+        companion = _build_companion_insight(results, scenario)
+
+    if mode in ("sensitivity", "both"):
+        option_names = [o.name for o in kept_options]
+        sensitivity = _build_sensitivity(scenario, option_names, norm_by_criterion, w_norm, delta=0.10)
 
     return results, filtered_out, companion, sensitivity

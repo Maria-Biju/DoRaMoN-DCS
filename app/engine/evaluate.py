@@ -186,9 +186,10 @@ def evaluate_wsm(
     MCDA - Weighted Sum Model (WSM)
 
     Includes:
-    - Part 8: apply constraints before scoring
-    - Part 6: strengths/weaknesses/why (template explanations)
-    - Part 13: optional companion insight + optional sensitivity analysis
+    - Constraints filtering (Part 8)
+    - strengths/weaknesses/why (Part 6)
+    - companion insight (winner vs runner-up) (Part 13)
+    - sensitivity (what-if +10% weight changes) (Part 13)
 
     Returns:
       (ranked_explanations, filtered_out, companion_insight, sensitivity)
@@ -220,11 +221,15 @@ def evaluate_wsm(
     for opt in kept_options:
         for c in scenario.criteria:
             if c.id not in opt.values:
-                raise ValueError(f"Option '{opt.name}' missing value for criterion '{c.name}' ({c.id}).")
+                raise ValueError(
+                    f"Option '{opt.name}' missing value for criterion '{c.name}' ({c.id})."
+                )
 
             v = opt.values[c.id]
             if not isinstance(v, (int, float)):
-                raise ValueError(f"Criterion '{c.name}' expects a number (got {type(v).__name__}).")
+                raise ValueError(
+                    f"Criterion '{c.name}' expects a number (got {type(v).__name__})."
+                )
 
             raw_by_criterion[c.id].append(float(v))
 
@@ -244,11 +249,13 @@ def evaluate_wsm(
         for c in scenario.criteria:
             contrib = float(w_norm[c.id]) * float(norm_by_criterion[c.id][i])
             contrib_r = round(contrib, 4)
+
             contributions[c.id] = contrib_r
             total_score += contrib
             readable_pairs.append((criterion_name[c.id], contrib_r))
 
         total_score_r = round(total_score, 4)
+
         strengths = _top_k_contributors(readable_pairs, k=min(2, len(readable_pairs)))
         weaknesses = _bottom_k_contributors(readable_pairs, k=min(2, len(readable_pairs)))
         why = _build_why(strengths, weaknesses, total_score_r)
@@ -267,17 +274,13 @@ def evaluate_wsm(
     # Rank by score descending
     results.sort(key=lambda r: float(r.score), reverse=True)
 
-    # Part 13: compute insights only when requested
-    mode = getattr(scenario, "insight_mode", "none") or "none"
+    # ✅ Always generate companion insight
+    companion: Optional[CompanionInsight] = _build_companion_insight(results, scenario)
 
-    companion: Optional[CompanionInsight] = None
-    sensitivity: Optional[SensitivityResult] = None
-
-    if mode in ("competitor", "both"):
-        companion = _build_companion_insight(results, scenario)
-
-    if mode in ("sensitivity", "both"):
-        option_names = [o.name for o in kept_options]
-        sensitivity = _build_sensitivity(scenario, option_names, norm_by_criterion, w_norm, delta=0.10)
+    # ✅ Always generate sensitivity
+    option_names = [o.name for o in kept_options]
+    sensitivity: Optional[SensitivityResult] = _build_sensitivity(
+        scenario, option_names, norm_by_criterion, w_norm, delta=0.10
+    )
 
     return results, filtered_out, companion, sensitivity

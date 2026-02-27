@@ -183,3 +183,81 @@ Help me divide the entire project into clear development parts based on system a
 - Ensured package structure / imports are correct (init files and correct module paths).
 - Fixed file naming mismatch (BUILD_PROCESS.md vs BUILT_PROCESS.md).
 - Updated Mermaid labels to GitHub-safe format (quotes and `<br/>` instead of `\n`).
+
+---
+
+## 2026-02-27 — Insights stabilization + API alignment
+
+### Prompts / Queries (raw)
+- It doesnt shows any summary
+- It is always saying too many values to unpack
+- So should i just send my evaluate_wsm function here can you make the update
+- The one i just send now is routes.py
+- Okay then give the final updated code
+
+### What happened
+While integrating companion insight and sensitivity analysis, I modified `evaluate_wsm()` to return four values instead of two:
+  - details
+  - filtered_out
+  - companion_insight
+  - sensitivity
+
+However, the API route was still unpacking only two values, which caused:
+  "too many values to unpack (expected 2)"
+
+After debugging:
+- I updated the route to unpack all four values.
+- Ensured `EvaluationResult` schema matched these fields.
+- Restarted the server to confirm proper return flow.
+
+### Additional issue discovered
+The UI was not displaying summary blocks even though scoring worked.
+
+Root cause:
+- Insights were gated behind an `insight_mode` field.
+- The UI payload did not include `insight_mode`.
+- So backend returned `None` for companion_insight and sensitivity.
+
+### Final decision
+Removed the gating logic and made companion insight + sensitivity always generated for MVP.
+
+Reason:
+- Assignment emphasizes explainability.
+- No need to make insight optional.
+- Simplifies UI and avoids hidden configuration issues.
+
+---
+
+## Reflection on design evolution
+At this stage, the system evolved from:
+  - Basic scoring engine
+to:
+  - Explainable scoring engine
+  - Per-criterion contribution visibility
+  - Strength/weakness extraction
+  - Closest competitor gap analysis
+  - Sensitivity (what-if) simulation
+
+This improved:
+  - Transparency
+  - Debuggability
+  - Confidence in recommendation stability
+  - Alignment with assignment goals
+
+---
+
+## Technical refinements made today
+- Refactored evaluate_wsm() return signature
+- Updated API route unpacking logic
+- Stabilized companion insight builder
+- Ensured summary is always returned when >=2 options
+- Verified UI integration using Swagger + browser
+- Validated investment and tech stack test cases
+
+---
+
+## Lessons learned
+- Whenever changing function return signature, all callers must be updated.
+- UI display issues are often due to missing JSON keys, not rendering logic.
+- Insight layers should be added after sorting results.
+- Transparency features require careful alignment between schema, engine, and UI.

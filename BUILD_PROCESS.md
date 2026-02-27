@@ -113,3 +113,28 @@ The project evolved incrementally:
 - **Part 9:** Added architectural and decision diagrams to visualize system design.
 
 Each step was implemented as a small incremental improvement to keep the build process transparent and traceable.
+
+## Refactoring decisions
+- Initially, the evaluation function returned only the ranked list. Later I refactored it to return a richer response:
+  - `details` (ranked options with scores + per-criterion contributions)
+  - `filtered_out` (options removed due to constraints)
+  - `companion_insight` (winner vs closest competitor + gap + short summary)
+  - `sensitivity` (simple what-if: increase each criterion weight by 10% and observe winner changes)
+- This refactor was done to satisfy the requirement: “Explain why the recommendation was made” and to make the system more transparent beyond just a score.
+
+## Mistakes and corrections
+- **Return unpacking mismatch (“too many values to unpack”)**
+  - Mistake: After extending `evaluate_wsm()` to return 4 values, the API route still unpacked only 2.
+  - Fix: Updated the route to unpack all 4 values and return them in `EvaluationResult`.
+- **Insights not showing in UI**
+  - Mistake: Insights were generated only when `insight_mode` was provided, but the UI payload did not send it.
+  - Fix: Removed the gating (always compute insights for MVP) so UI always gets `companion_insight` and `sensitivity`.
+
+## What changed during development and why
+- I started with a minimal WSM scoring engine to keep decision logic explainable.
+- As the project grew, I added explanation layers:
+  - contributions per criterion
+  - strengths/weaknesses and a short “why” template
+  - competitor gap summary
+  - sensitivity checks
+- I kept the algorithm simple but made the output richer because the assignment evaluates clarity, transparency, and how I evolved the design.

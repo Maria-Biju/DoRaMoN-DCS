@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Decision Companion System</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#111a33;
+      --muted:#9fb0d0;
+      --text:#eaf0ff;
+      --border:#233156;
+      --accent:#6ea8fe;
+      --accent2:#7ee7c2;
+      --danger:#ff6b6b;
+      --warn:#ffd166;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 15% 10%, rgba(110,168,254,.20), transparent 60%),
+                  radial-gradient(900px 700px at 90% 30%, rgba(126,231,194,.14), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:28px 16px 64px;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    .title{
+      font-size:26px;
+      font-weight:800;
+      letter-spacing:.2px;
+      margin:0;
+    }
+    .subtitle{
+      margin:6px 0 0;
+      color:var(--muted);
+      max-width:760px;
+      font-size:14px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      color:var(--muted);
+      background: rgba(17,26,51,.6);
+      box-shadow: var(--shadow);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media(min-width: 980px){
+      .grid{
+        grid-template-columns: 1.2fr .8fr;
+        align-items:start;
+      }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(17,26,51,.85), rgba(17,26,51,.70));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+
+    .card h2{
+      margin:0 0 12px;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:flex-end;
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background: rgba(11,16,32,.65);
+      color: var(--text);
+      outline:none;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(110,168,254,.55);
+      box-shadow: 0 0 0 4px rgba(110,168,254,.15);
+    }
+
+    .field{
+      flex: 1 1 220px;
+      min-width: 220px;
+    }
+    .field.small{
+      flex: 0 1 150px;
+      min-width:150px;
+    }
+
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(17,26,51,.85);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:700;
+      transition: transform .06s ease, border-color .18s ease, background .18s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ border-color: rgba(110,168,254,.55); }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(110,168,254,.95), rgba(110,168,254,.65));
+      border-color: rgba(110,168,254,.65);
+      color: #06102a;
+    }
+    .btn.primary:hover{
+      border-color: rgba(126,231,194,.7);
+    }
+
+    .btn.ghost{
+      background: transparent;
+      border-color: var(--border);
+      color: var(--muted);
+    }
+
+    .btn.danger{
+      background: rgba(255,107,107,.15);
+      border-color: rgba(255,107,107,.4);
+      color: #ffd0d0;
+    }
+
+    .muted{ color: var(--muted); }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .item{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+      background: rgba(11,16,32,.35);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .item strong{ display:block; font-size:14px; }
+    .item .meta{ font-size:12px; color: var(--muted); margin-top:4px; }
+    .item .actions{ display:flex; gap:8px; }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(11,16,32,.35);
+    }
+    th, td{
+      padding:10px;
+      border-bottom:1px solid rgba(35,49,86,.55);
+      border-right:1px solid rgba(35,49,86,.35);
+      text-align:left;
+      vertical-align:top;
+      font-size:13px;
+    }
+    th{
+      background: rgba(17,26,51,.6);
+      color: var(--muted);
+      font-weight:800;
+      font-size:12px;
+    }
+    tr:last-child td{ border-bottom:none; }
+    td:last-child, th:last-child{ border-right:none; }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color: var(--muted);
+      background: rgba(17,26,51,.55);
+      margin-right:6px;
+      margin-top:6px;
+    }
+    .tag.good{ border-color: rgba(126,231,194,.45); }
+    .tag.warn{ border-color: rgba(255,209,102,.45); }
+    .tag.bad{ border-color: rgba(255,107,107,.45); }
+
+    .resultBlock{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .resultCard{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      background: rgba(11,16,32,.35);
+    }
+    .resultHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .resultHeader h3{
+      margin:0;
+      font-size:15px;
+      font-weight:900;
+    }
+    .score{
+      font-weight:900;
+      color:#06102a;
+      background: linear-gradient(135deg, rgba(126,231,194,.95), rgba(126,231,194,.65));
+      border:1px solid rgba(126,231,194,.65);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .hr{
+      height:1px;
+      background: rgba(35,49,86,.65);
+      margin:10px 0;
+    }
+
+    .twoCol{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    @media(min-width: 760px){
+      .twoCol{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .toast{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,209,102,.45);
+      background: rgba(255,209,102,.10);
+      color:#ffe6a3;
+      font-size:13px;
+      display:none;
+    }
+
+    .error{
+      border-color: rgba(255,107,107,.55) !important;
+      background: rgba(255,107,107,.10) !important;
+      color: #ffd0d0 !important;
+    }
+
+    .footerNote{
+      margin-top:10px;
+      font-size:12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1 class="title">Decision Companion System</h1>
+        <p class="subtitle">
+          Create your decision, add criteria (benefit/cost + weights), add options with values, then evaluate using a transparent MCDA Weighted Sum Model.
+          Results include explanations, closest competitor insight, and sensitivity (what-if weight changes).
+        </p>
+      </div>
+      <div class="pill">
+        <span>API:</span>
+        <span class="muted">POST /api/evaluate</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: BUILD SCENARIO -->
+      <div class="card">
+        <h2>1) Define Decision</h2>
+        <div class="row">
+          <div class="field">
+            <label for="title">Decision Title</label>
+            <input id="title" placeholder="e.g., Backend tech stack selection" />
+          </div>
+          <div class="field">
+            <label for="preset">Quick Preset (optional)</label>
+            <select id="preset">
+              <option value="">— Choose a preset —</option>
+              <option value="hiring">Hiring (Candidates)</option>
+              <option value="travel">Travel Destination</option>
+              <option value="techstack">Tech Stack</option>
+              <option value="investment">Investment Plan</option>
+            </select>
+          </div>
+          <div class="field small">
+            <button class="btn ghost" id="btnLoadPreset" type="button">Load Preset</button>
+          </div>
+          <div class="field small">
+            <button class="btn danger" id="btnReset" type="button">Reset</button>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>2) Criteria</h2>
+        <div class="row">
+          <div class="field">
+            <label for="critName">Criterion Name</label>
+            <input id="critName" placeholder="e.g., Infrastructure Cost" />
+          </div>
+          <div class="field small">
+            <label for="critWeight">Weight</label>
+            <input id="critWeight" type="number" min="0" step="1" placeholder="e.g., 30" />
+          </div>
+          <div class="field">
+            <label for="critGoal">Goal</label>
+            <select id="critGoal">
+              <option value="benefit">Benefit (higher is better)</option>
+              <option value="cost">Cost (lower is better)</option>
+            </select>
+          </div>
+          <div class="field small">
+            <label>&nbsp;</label>
+            <button class="btn" id="btnAddCriterion" type="button">Add Criterion</button>
+          </div>
+        </div>
+
+        <div class="list" id="criteriaList"></div>
+
+        <div class="hr"></div>
+
+        <h2>3) Options</h2>
+        <div class="row">
+          <div class="field">
+            <label for="optionName">Option Name</label>
+            <input id="optionName" placeholder="e.g., Go / Django / Node.js" />
+          </div>
+          <div class="field small">
+            <label>&nbsp;</label>
+            <button class="btn" id="btnAddOption" type="button">Add Option</button>
+          </div>
+        </div>
+
+        <div class="list" id="optionsList"></div>
+
+        <div class="hr"></div>
+
+        <h2>4) Enter Values</h2>
+        <p class="muted" style="margin:0 0 10px;">
+          Fill numeric values for each option × criterion. (ctype is automatically set to <b>number</b>.)
+        </p>
+
+        <div id="matrixWrap"></div>
+
+        <div class="row" style="margin-top:14px;">
+          <button class="btn primary" id="btnEvaluate" type="button">Evaluate</button>
+          <button class="btn ghost" id="btnFillDemo" type="button">Fill Demo Values</button>
+        </div>
+
+        <div class="toast" id="toast"></div>
+        <div class="footerNote">
+          Tip: IDs are auto-generated from criterion names (lowercase + underscores) and used internally for mapping values.
+        </div>
+      </div>
+
+      <!-- RIGHT: RESULTS -->
+      <div class="card">
+        <h2>Results</h2>
+        <div id="resultsWrap" class="muted">Run an evaluation to see ranked recommendations.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -----------------------------
+    // State
+    // -----------------------------
+    let criteria = []; // {id, name, weight, goal, ctype}
+    let options = [];  // {name, values: {criterion_id: number}}
+    const $ = (id) => document.getElementById(id);
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    function makeId(name) {
+      return name
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+    }
+
+    function showToast(msg, type = "warn") {
+      const t = $("toast");
+      t.style.display = "block";
+      t.classList.remove("error");
+      if (type === "error") t.classList.add("error");
+      t.innerText = msg;
+      setTimeout(() => { t.style.display = "none"; }, 4500);
+    }
+
+    function fmt(n) {
+      const x = Number(n);
+      if (Number.isNaN(x)) return "-";
+      return Math.round(x * 10000) / 10000;
+    }
+
+    function ensureOptionValuesShape() {
+      // ensure each option has every criterion id (default empty string for UI input)
+      for (const opt of options) {
+        if (!opt.values) opt.values = {};
+        for (const c of criteria) {
+          if (!(c.id in opt.values)) opt.values[c.id] = "";
+        }
+      }
+    }
+
+    // -----------------------------
+    // Render functions
+    // -----------------------------
+    function renderCriteria() {
+      const list = $("criteriaList");
+      list.innerHTML = "";
+
+      if (criteria.length === 0) {
+        list.innerHTML = `<div class="muted">No criteria added yet.</div>`;
+        renderMatrix();
+        return;
+      }
+
+      criteria.forEach((c, idx) => {
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div>
+            <strong>${c.name}</strong>
+            <div class="meta">
+              <span class="tag ${c.goal === "benefit" ? "good" : "warn"}">${c.goal}</span>
+              <span class="tag">weight: ${c.weight}</span>
+              <span class="tag">id: ${c.id}</span>
+              <span class="tag">ctype: ${c.ctype}</span>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn danger" type="button" data-crit-remove="${idx}">Remove</button>
+          </div>
+        `;
+        list.appendChild(el);
+      });
+
+      // bind remove
+      list.querySelectorAll("[data-crit-remove]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.getAttribute("data-crit-remove"));
+          const removed = criteria[idx];
+          criteria.splice(idx, 1);
+          // remove values for that criterion from options
+          for (const opt of options) {
+            if (opt.values && removed && removed.id in opt.values) delete opt.values[removed.id];
+          }
+          renderAll();
+        });
+      });
+
+      renderMatrix();
+    }
+
+    function renderOptions() {
+      const list = $("optionsList");
+      list.innerHTML = "";
+
+      if (options.length === 0) {
+        list.innerHTML = `<div class="muted">No options added yet.</div>`;
+        renderMatrix();
+        return;
+      }
+
+      options.forEach((o, idx) => {
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div>
+            <strong>${o.name}</strong>
+            <div class="meta">Values will be filled in the matrix below.</div>
+          </div>
+          <div class="actions">
+            <button class="btn danger" type="button" data-opt-remove="${idx}">Remove</button>
+          </div>
+        `;
+        list.appendChild(el);
+      });
+
+      list.querySelectorAll("[data-opt-remove]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.getAttribute("data-opt-remove"));
+          options.splice(idx, 1);
+          renderAll();
+        });
+      });
+
+      renderMatrix();
+    }
+
+    function renderMatrix() {
+      const wrap = $("matrixWrap");
+      wrap.innerHTML = "";
+
+      if (criteria.length === 0 || options.length === 0) {
+        wrap.innerHTML = `<div class="muted">Add at least 1 criterion and 1 option to enter values.</div>`;
+        return;
+      }
+
+      ensureOptionValuesShape();
+
+      let html = `<table>
+        <thead>
+          <tr>
+            <th style="width:220px;">Option</th>
+            ${criteria.map(c => `<th>${c.name}<div class="muted" style="font-weight:700;font-size:11px;margin-top:4px;">(${c.goal}, w=${c.weight})</div></th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${options.map((o, oi) => `
+            <tr>
+              <td><strong>${o.name}</strong></td>
+              ${criteria.map((c) => `
+                <td>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="Enter number"
+                    data-matrix
+                    data-opt="${oi}"
+                    data-crit="${c.id}"
+                    value="${o.values[c.id] ?? ""}"
+                  />
+                </td>
+              `).join("")}
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`;
+
+      wrap.innerHTML = html;
+
+      // bind inputs
+      wrap.querySelectorAll("input[data-matrix]").forEach(inp => {
+        inp.addEventListener("input", () => {
+          const oi = Number(inp.getAttribute("data-opt"));
+          const cid = inp.getAttribute("data-crit");
+          options[oi].values[cid] = inp.value;
+        });
+      });
+    }
+
+    function renderResults(data) {
+      const wrap = $("resultsWrap");
+      if (!data) {
+        wrap.innerHTML = `<div class="muted">Run an evaluation to see ranked recommendations.</div>`;
+        return;
+      }
+
+      const ranked = (data.details || []);
+      const filtered = (data.filtered_out || []);
+      const insight = data.companion_insight || null;
+      const sens = data.sensitivity || null;
+
+      let html = "";
+
+      // Summary top
+      if (ranked.length > 0) {
+        html += `<div class="resultCard">
+          <div class="resultHeader">
+            <h3>Top Recommendation</h3>
+            <div class="score">#1: ${ranked[0].name}</div>
+          </div>
+          <div class="hr"></div>
+          <div class="muted">${ranked[0].why || ""}</div>
+        </div>`;
+      }
+
+      // Companion insight
+      if (insight) {
+        html += `<div class="resultCard">
+          <div class="resultHeader">
+            <h3>Companion Insight</h3>
+            <div class="score">Gap: ${fmt(insight.runner_up_gap)}</div>
+          </div>
+          <div class="hr"></div>
+          <div><b>Winner:</b> ${insight.winner}</div>
+          <div><b>Closest competitor:</b> ${insight.runner_up}</div>
+          <div class="muted" style="margin-top:8px;">${insight.summary}</div>
+        </div>`;
+      }
+
+      // Sensitivity
+      if (sens) {
+        html += `<div class="resultCard">
+          <div class="resultHeader">
+            <h3>Sensitivity (What-if)</h3>
+            <div class="score">Δ: +${Math.round((sens.delta || 0) * 100)}%</div>
+          </div>
+          <div class="hr"></div>
+          <div class="muted">${sens.summary || ""}</div>
+          ${sens.most_sensitive_criterion_id ? `<div class="muted" style="margin-top:6px;"><b>Most sensitive:</b> ${sens.most_sensitive_criterion_id}</div>` : ""}
+          <div class="hr"></div>
+          <div style="overflow:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Criterion</th>
+                  <th>Winner After</th>
+                  <th>Changed?</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${(sens.tests || []).map(t => `
+                  <tr>
+                    <td>${t.criterion_id}</td>
+                    <td>${t.winner_after}</td>
+                    <td>${t.changed ? "Yes" : "No"}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+      }
+
+      // Ranked details
+      if (ranked.length > 0) {
+        html += `<div class="resultCard">
+          <div class="resultHeader">
+            <h3>Ranked Options</h3>
+            <div class="muted">Scores + reasons</div>
+          </div>
+          <div class="hr"></div>
+          <div class="resultBlock">
+            ${ranked.map((r, idx) => `
+              <div class="resultCard" style="padding:12px;">
+                <div class="resultHeader">
+                  <h3>#${idx + 1}: ${r.name}</h3>
+                  <div class="score">score: ${fmt(r.score)}</div>
+                </div>
+                <div class="twoCol" style="margin-top:10px;">
+                  <div>
+                    <div class="muted" style="font-weight:800;">Strengths</div>
+                    ${(r.strengths || []).map(s => `<span class="tag good">${s}</span>`).join("") || `<div class="muted">—</div>`}
+                  </div>
+                  <div>
+                    <div class="muted" style="font-weight:800;">Weaknesses</div>
+                    ${(r.weaknesses || []).map(w => `<span class="tag warn">${w}</span>`).join("") || `<div class="muted">—</div>`}
+                  </div>
+                </div>
+                <div class="hr"></div>
+                <div class="muted">${r.why || ""}</div>
+              </div>
+            `).join("")}
+          </div>
+        </div>`;
+      }
+
+      // Filtered out
+      if (filtered.length > 0) {
+        html += `<div class="resultCard">
+          <div class="resultHeader">
+            <h3>Filtered Out (Constraints)</h3>
+            <div class="muted">${filtered.length} option(s)</div>
+          </div>
+          <div class="hr"></div>
+          ${filtered.map(f => `
+            <div style="margin-bottom:10px;">
+              <b>${f.name}</b>
+              <div class="muted">${(f.reasons || []).join("; ")}</div>
+            </div>
+          `).join("")}
+        </div>`;
+      }
+
+      wrap.innerHTML = html || `<div class="muted">No results.</div>`;
+    }
+
+    function renderAll() {
+      renderCriteria();
+      renderOptions();
+      // matrix is rendered inside these
+    }
+
+    // -----------------------------
+    // Actions
+    // -----------------------------
+    function addCriterion() {
+      const name = $("critName").value.trim();
+      const weightRaw = $("critWeight").value;
+      const goal = $("critGoal").value;
+
+      if (!name) return showToast("Please enter a criterion name.", "error");
+      const weight = Number(weightRaw);
+      if (!Number.isFinite(weight) || weight < 0) return showToast("Weight must be a non-negative number.", "error");
+
+      const id = makeId(name);
+      if (!id) return showToast("Could not generate a valid id from the name. Try a different name.", "error");
+
+      if (criteria.some(c => c.id === id)) {
+        return showToast("Duplicate criterion id detected. Use a different name.", "error");
+      }
+
+      criteria.push({ id, name, weight, goal, ctype: "number" });
+
+      $("critName").value = "";
+      $("critWeight").value = "";
+
+      ensureOptionValuesShape();
+      renderAll();
+    }
+
+    function addOption() {
+      const name = $("optionName").value.trim();
+      if (!name) return showToast("Please enter an option name.", "error");
+      if (criteria.length === 0) return showToast("Add criteria before adding options.", "error");
+
+      if (options.some(o => o.name.toLowerCase() === name.toLowerCase())) {
+        return showToast("Duplicate option name detected. Use a different name.", "error");
+      }
+
+      const values = {};
+      for (const c of criteria) values[c.id] = "";
+      options.push({ name, values });
+
+      $("optionName").value = "";
+      renderAll();
+    }
+
+    function resetAll() {
+      criteria = [];
+      options = [];
+      $("title").value = "";
+      $("preset").value = "";
+      renderAll();
+      renderResults(null);
+      showToast("Reset complete.", "warn");
+    }
+
+    function fillDemoValues() {
+      if (criteria.length === 0 || options.length === 0) {
+        return showToast("Add criteria and options first, then fill demo values.", "error");
+      }
+      // Fill increasing demo numbers just for quick testing
+      options.forEach((o, oi) => {
+        criteria.forEach((c, ci) => {
+          const base = (oi + 1) * 10 + (ci + 1) * 3;
+          o.values[c.id] = String(base);
+        });
+      });
+      renderMatrix();
+      showToast("Demo values filled. You can edit them.", "warn");
+    }
+
+    function loadPreset() {
+      const p = $("preset").value;
+      if (!p) return showToast("Choose a preset first.", "error");
+
+      resetAll();
+
+      if (p === "hiring") {
+        $("title").value = "Hiring Backend Developer";
+        criteria = [
+          {id:"skills", name:"Technical Skills", weight:50, goal:"benefit", ctype:"number"},
+          {id:"communication", name:"Communication", weight:20, goal:"benefit", ctype:"number"},
+          {id:"salary", name:"Expected Salary", weight:30, goal:"cost", ctype:"number"},
+        ];
+        options = [
+          {name:"Candidate A", values:{skills:"85", communication:"70", salary:"80000"}},
+          {name:"Candidate B", values:{skills:"78", communication:"90", salary:"75000"}},
+          {name:"Candidate C", values:{skills:"92", communication:"60", salary:"95000"}},
+        ];
+      } else if (p === "travel") {
+        $("title").value = "Travel Destination Selection";
+        criteria = [
+          {id:"cost", name:"Trip Cost", weight:40, goal:"cost", ctype:"number"},
+          {id:"safety", name:"Safety Score", weight:30, goal:"benefit", ctype:"number"},
+          {id:"attractions", name:"Attractions Score", weight:30, goal:"benefit", ctype:"number"},
+        ];
+        options = [
+          {name:"Destination A", values:{cost:"50000", safety:"8", attractions:"9"}},
+          {name:"Destination B", values:{cost:"45000", safety:"7", attractions:"8"}},
+          {name:"Destination C", values:{cost:"60000", safety:"9", attractions:"7"}},
+        ];
+      } else if (p === "techstack") {
+        $("title").value = "Backend Tech Stack Selection";
+        criteria = [
+          {id:"performance", name:"Performance", weight:35, goal:"benefit", ctype:"number"},
+          {id:"developer_availability", name:"Developer Availability", weight:30, goal:"benefit", ctype:"number"},
+          {id:"cost", name:"Infrastructure Cost", weight:20, goal:"cost", ctype:"number"},
+          {id:"learning_curve", name:"Learning Curve", weight:15, goal:"cost", ctype:"number"},
+        ];
+        options = [
+          {name:"Node.js", values:{performance:"8", developer_availability:"9", cost:"7", learning_curve:"6"}},
+          {name:"Django", values:{performance:"7", developer_availability:"8", cost:"6", learning_curve:"5"}},
+          {name:"Go", values:{performance:"9", developer_availability:"6", cost:"5", learning_curve:"8"}},
+        ];
+      } else if (p === "investment") {
+        $("title").value = "Investment Strategy Selection";
+        criteria = [
+          {id:"expected_return", name:"Expected Return", weight:40, goal:"benefit", ctype:"number"},
+          {id:"risk", name:"Risk Level", weight:35, goal:"cost", ctype:"number"},
+          {id:"liquidity", name:"Liquidity", weight:15, goal:"benefit", ctype:"number"},
+          {id:"fees", name:"Fees", weight:10, goal:"cost", ctype:"number"},
+        ];
+        options = [
+          {name:"Index Funds", values:{expected_return:"8", risk:"4", liquidity:"8", fees:"2"}},
+          {name:"Fixed Deposit", values:{expected_return:"5", risk:"2", liquidity:"4", fees:"1"}},
+          {name:"Crypto", values:{expected_return:"10", risk:"9", liquidity:"9", fees:"5"}},
+        ];
+      }
+
+      ensureOptionValuesShape();
+      renderAll();
+      renderResults(null);
+      showToast("Preset loaded. You can edit anything before evaluating.", "warn");
+    }
+
+    function buildPayload() {
+      const title = $("title").value.trim();
+      if (!title) throw new Error("Decision title is required.");
+      if (criteria.length < 1) throw new Error("Add at least 1 criterion.");
+      if (options.length < 2) throw new Error("Add at least 2 options.");
+
+      // Validate values: all must be numeric
+      const cleanOptions = options.map(o => {
+        const values = {};
+        for (const c of criteria) {
+          const raw = o.values?.[c.id];
+          if (raw === "" || raw === null || raw === undefined) {
+            throw new Error(`Missing value: option '${o.name}' for criterion '${c.name}'.`);
+          }
+          const num = Number(raw);
+          if (!Number.isFinite(num)) {
+            throw new Error(`Invalid number: option '${o.name}' for criterion '${c.name}'.`);
+          }
+          values[c.id] = num;
+        }
+        return { name: o.name, values };
+      });
+
+      const cleanCriteria = criteria.map(c => ({
+        id: c.id,
+        name: c.name,
+        weight: Number(c.weight),
+        goal: c.goal,
+        ctype: "number"
+      }));
+
+      return { title, criteria: cleanCriteria, options: cleanOptions };
+    }
+
+    async function evaluateNow() {
+      try {
+        const payload = buildPayload();
+
+        const res = await fetch("/api/evaluate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          // FastAPI usually returns {detail: ...}
+          const msg = data?.detail
+            ? (typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail))
+            : `Request failed (${res.status})`;
+          throw new Error(msg);
+        }
+
+        renderResults(data);
+        showToast("Evaluation completed.", "warn");
+      } catch (e) {
+        showToast(e.message || "Evaluation failed.", "error");
+      }
+    }
+
+    // -----------------------------
+    // Event bindings
+    // -----------------------------
+    $("btnAddCriterion").addEventListener("click", addCriterion);
+    $("btnAddOption").addEventListener("click", addOption);
+    $("btnEvaluate").addEventListener("click", evaluateNow);
+    $("btnReset").addEventListener("click", resetAll);
+    $("btnFillDemo").addEventListener("click", fillDemoValues);
+    $("btnLoadPreset").addEventListener("click", loadPreset);
+
+    // Enter key shortcuts
+    $("critName").addEventListener("keydown", (e) => { if (e.key === "Enter") addCriterion(); });
+    $("critWeight").addEventListener("keydown", (e) => { if (e.key === "Enter") addCriterion(); });
+    $("optionName").addEventListener("keydown", (e) => { if (e.key === "Enter") addOption(); });
+
+    // Initial render
+    renderAll();
+  </script>
+</body>
+</html>

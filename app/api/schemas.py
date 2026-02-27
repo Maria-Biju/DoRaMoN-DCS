@@ -51,19 +51,50 @@ class Scenario(BaseModel):
     constraints: List[Constraint] = []
 
 # ---- Placeholder response model for the next parts ----
+from typing import Dict, List, Optional
+from pydantic import BaseModel
+
+
 class OptionExplanation(BaseModel):
     name: str
     score: float
     contributions: Dict[str, float]
-    strengths: List[str]=[]
-    weaknesses: List[str]=[]
-    why: str =""
+    strengths: List[str] = []
+    weaknesses: List[str] = []
+    why: str = ""
+
+
 class FilteredOutOption(BaseModel):
     name: str
     reasons: List[str]
-    
+
+
+class CompanionInsight(BaseModel):
+    winner: str
+    runner_up: str
+    runner_up_gap: float
+    runner_up_reasons: List[str]
+    summary: str
+
+
+class SensitivityTest(BaseModel):
+    criterion_id: str
+    winner_after: str
+    changed: bool
+
+
+class SensitivityResult(BaseModel):
+    delta: float
+    winner: str
+    summary: str
+    tests: List[SensitivityTest]
+    most_sensitive_criterion_id: Optional[str] = None
+
+
 class EvaluationResult(BaseModel):
     title: str
     ranked_option_names: List[str]
     details: List[OptionExplanation]
     filtered_out: List[FilteredOutOption] = []
+    companion_insight: Optional[CompanionInsight] = None
+    sensitivity: Optional[SensitivityResult] = None
